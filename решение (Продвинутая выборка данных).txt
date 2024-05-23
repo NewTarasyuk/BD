@@ -1,0 +1,41 @@
+SELECT "duration","track_name" FROM "Треки" ORDER BY "duration" DESC LIMIT 1;
+SELECT "duration","track_name" FROM "Треки" WHERE "duration" > 210 ;
+SELECT "collection_name","collection_data" FROM "Сборник" WHERE "collection_data" BETWEEN '2018-01-01' AND '2020-01-01' ;
+WITH lastname_tabl AS (
+  SELECT REGEXP_REPLACE(ejecutante_name , '^.*\s+(\S+)$', '\0') AS lastname FROM Исполнители 
+)
+SELECT * FROM lastname_tabl WHERE lastname NOT LIKE '%\0%';
+
+SELECT * FROM "Треки"
+	WHERE track_name LIKE '%my%';
+
+3 задание
+
+1)
+SELECT genre_name,COUNT(ejecutante_name)FROM "название_музыкальных_жанров"
+INNER JOIN
+  Исполнители
+    ON название_музыкальных_жанров.Id = Исполнители.genre_id
+	GROUP BY genre_name;
+2)	
+SELECT album_name,COUNT(track_name)FROM Альбом
+INNER JOIN
+  Треки
+    ON Альбом.id = Треки.album_id
+	WHERE album_date BETWEEN '2019-01-01' AND '2020-12-31'
+	GROUP BY album_name;
+	
+3)SELECT album_name,COUNT(track_name), AVG(duration)FROM Альбом
+INNER JOIN
+  Треки
+    ON Альбом.id = Треки.album_id
+	GROUP BY album_name;
+	
+4)SELECT album_name,COUNT(track_name)FROM Альбом
+INNER JOIN
+  Треки
+    ON Альбом.id = Треки.album_id
+	WHERE album_date NOT BETWEEN '1998-01-01' AND '1998-12-31'
+	GROUP BY album_name;
+	
+
