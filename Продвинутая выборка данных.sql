@@ -63,6 +63,16 @@ INSERT INTO Треки(track_name,ejecutante_id,duration) VALUES
 INSERT INTO Исполнители( ejecutante_name,genre_id) VALUES
  ('Зве́ри',5);
  
+ CREATE TABLE Сборники
+(song_id INTEGER NOT NULL,
+ collection_id INT NOT NULL,
+ collection_name char(100) NOT NULL,
+  CONSTRAINT pk_cs PRIMARY KEY (collection_id, song_id)
+);
+ 
+INSERT INTO Сборники (song_id, collection_id)
+values (1, 1,"Тверские"),(2, 1,"Тверские");
+ 
 Задание 2
 1) SELECT "duration","track_name" FROM "Треки" ORDER BY "duration" DESC LIMIT 1;
 2) SELECT "duration","track_name" FROM "Треки" WHERE "duration" > 210 ;
@@ -77,33 +87,38 @@ SELECT * FROM lastname_tabl WHERE lastname NOT LIKE '%\0%';
 3 задание
 
 1) SELECT genre_name,COUNT(ejecutante_name)FROM "название_музыкальных_жанров"
-INNER JOIN
+ JOIN
   Исполнители
     ON название_музыкальных_жанров.Id = Исполнители.genre_id
 	GROUP BY genre_name;
 2) SELECT album_name,COUNT(track_name)FROM Альбом
-INNER JOIN
+ JOIN
   Треки
     ON Альбом.id = Треки.album_id
 	WHERE album_date BETWEEN '2019-01-01' AND '2020-12-31'
 	GROUP BY album_name;
 	
 3)SELECT album_name,COUNT(track_name), AVG(duration)FROM Альбом
-INNER JOIN
+ JOIN
   Треки
     ON Альбом.id = Треки.album_id
 	GROUP BY album_name;
 	
-4)SELECT ejecutante_name FROM Альбом
-INNER JOIN
-  Исполнители
-    ON Альбом.ejecutante_id = Исполнители.id
-	WHERE album_date NOT BETWEEN '2019-01-01' AND '2020-12-31'
-	GROUP BY ejecutante_name;
+4)SELECT * FROM Исполнители WHERE id NOT IN (SELECT ejecutante_id FROM Альбом 
+WHERE album_date  BETWEEN '1985-01-01' AND '2020-12-31'
+GROUP BY ejecutante_id
+);
 	
-5)SELECT ejecutante_name,album_name FROM Альбом
-INNER JOIN
+5)WITH trek_tabl AS (
+  SELECT Треки.id FROM Треки
+ JOIN
   Исполнители
-    ON Альбом.ejecutante_id = Исполнители.id
-	WHERE ejecutante_name LIKE '%Михаил Круг%';
+    ON Треки.ejecutante_id = Исполнители.id
+	WHERE ejecutante_name LIKE '%Михаил Круг%' 
+)
+SELECT collection_name FROM trek_tabl
+ JOIN
+  Сборники
+    ON Сборники.song_id = trek_tabl.id 
+	GROUP BY collection_name; 
 	
