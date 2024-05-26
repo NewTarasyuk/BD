@@ -105,7 +105,7 @@ SELECT * FROM lastname_tabl WHERE lastname NOT LIKE '%\0%';
 	GROUP BY album_name;
 	
 4)SELECT * FROM Исполнители WHERE id NOT IN (SELECT ejecutante_id FROM Альбом 
-WHERE album_date  BETWEEN '1985-01-01' AND '2020-12-31'
+WHERE album_date  BETWEEN '2020-01-01' AND '2020-12-31'
 GROUP BY ejecutante_id
 );
 	
