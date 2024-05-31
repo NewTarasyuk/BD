@@ -19,7 +19,7 @@ CREATE TABLE "Исполнители"
 INSERT INTO Исполнители( ejecutante_name,genre_id) VALUES
 ('Михаил Круг',1),
 ('Алиса',2),
-('Гражданская оборона',3),
+('Гражданская оборона',3), 
 ('Теуникова, Юлия Александровна',4);
 
 CREATE TABLE "Альбом"
@@ -58,3 +58,68 @@ INSERT INTO Альбом( album_name,ejecutante_id,album_date) VALUES
 
 INSERT INTO Треки(track_name,ejecutante_id,duration) VALUES
 ('All My Loving',5,129);
+
+INSERT INTO Исполнители( ejecutante_name,genre_id) VALUES
+ ('Зве́ри',5);
+ 
+CREATE TABLE Сборники
+(song_id INTEGER NOT NULL,
+ collection_id INT NOT NULL,
+ collection_name char(100) NOT NULL,
+  CONSTRAINT pk_cs PRIMARY KEY (collection_id, song_id)
+);
+ 
+INSERT INTO Сборники (song_id, collection_id)
+values (1, 1,"Тверские"),(2, 1,"Тверские");
+
+
+
+create table if not exists Жанры (
+	genre_id serial primary key,
+	genre_name varchar (100) not null unique
+);
+
+create table if not exists Исполнители (
+	singer_id serial primary key,
+	singer_name VARCHAR (100) not null
+);
+
+create table if not exists Альбом (
+	album_id integer primary key,
+	album_name varchar (100) not null,
+	album_release_year date not null
+);
+
+create table if not exists Треки (
+	track_id integer primary key,
+	track_name varchar (100) not null,
+	track_duration time not null,
+	album_id integer references Альбом(album_id) not null
+	
+	
+create table if not exists Исполнитель_жанр (
+	singer_id integer references Исполнители(singer_id) not null,
+	genre_id integer references Жанры(genre_id) not null,
+	constraint ke primary key (singer_id, genre_id)
+);
+
+
+create table if not exists Исполнитель_и_альбом (
+	singer_id integer references Исполнители(singer_id) not null,
+	album_id integer references Альбом(album_id) not null,
+	constraint ke_ primary key (singer_id, album_id)
+);
+
+
+create table if not exists Сборник (
+	collection_id serial primary key,
+	collection_name varchar (100) not null,
+	collection_date date not null
+);
+
+
+create table if not exists Сборник_треков (
+	collection_id integer references Сборник(collection_id) not null,
+	track_id integer references Треки(track_id) not null,
+	constraint ke__ primary key (collection_id, track_id)
+);

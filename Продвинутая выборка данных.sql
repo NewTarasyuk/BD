@@ -1,124 +1,51 @@
-Задание 1
-CREATE TABLE "название_музыкальных_жанров"
-(Id SERIAL PRIMARY KEY,
- genre_name char(50) NOT NULL
-);
-
-INSERT INTO название_музыкальных_жанров( genre_name) VALUES
-('Шансон'),
-('рок'),
-('панк'),
-('блюз');
-
-CREATE TABLE "Исполнители"
-(Id SERIAL PRIMARY KEY,
- ejecutante_name char(100) NOT NULL,
- genre_id INT NOT NULL
-);
-
-
-INSERT INTO Исполнители( ejecutante_name,genre_id) VALUES
-('Михаил Круг',1),
-('Алиса',2),
-('Гражданская оборона',3), 
-('Теуникова, Юлия Александровна',4);
-
-CREATE TABLE "Альбом"
-(Id SERIAL PRIMARY KEY,
- album_name char(50) NOT NULL,
- ejecutante_id INT NOT NULL,
- album_date date NOT NULL
-);
-
-INSERT INTO Альбом( album_name,ejecutante_id,album_date) VALUES
-('Лизок',1,'1999-01-01'),
-('Катя',1,'1999-01-01'),
-('Энергия',2,'1985-01-01'),
-('Поганая молодёжь',3,'1985-01-01');
-
-CREATE TABLE "Треки"
-(Id SERIAL PRIMARY KEY,
- track_name char(100) NOT NULL,
- ejecutante_id INT NOT NULL,
- duration int NOT NULL
-);
-
-INSERT INTO Треки(track_name,ejecutante_id,duration) VALUES
-('Тверские Улици',1,163),
-('Электричка',1,229),
-('Мы вместе',3,162);
-
-INSERT INTO название_музыкальных_жанров( genre_name) VALUES
-('поп-рок');
-
-INSERT INTO Исполнители( ejecutante_name,genre_id) VALUES
-('The Beatles',5);
-
-INSERT INTO Альбом( album_name,ejecutante_id,album_date) VALUES
-('With The Beatles',5,'1963-11-30');
-
-INSERT INTO Треки(track_name,ejecutante_id,duration) VALUES
-('All My Loving',5,129);
-
-INSERT INTO Исполнители( ejecutante_name,genre_id) VALUES
- ('Зве́ри',5);
- 
- CREATE TABLE Сборники
-(song_id INTEGER NOT NULL,
- collection_id INT NOT NULL,
- collection_name char(100) NOT NULL,
-  CONSTRAINT pk_cs PRIMARY KEY (collection_id, song_id)
-);
- 
-INSERT INTO Сборники (song_id, collection_id)
-values (1, 1,"Тверские"),(2, 1,"Тверские");
  
 Задание 2
-1) SELECT "duration","track_name" FROM "Треки" ORDER BY "duration" DESC LIMIT 1;
-2) SELECT "duration","track_name" FROM "Треки" WHERE "duration" > 210 ;
-3) SELECT "collection_name","collection_data" FROM "Сборник" WHERE "collection_data" BETWEEN '2018-01-01' AND '2020-01-01' ;
+1) SELECT Song_duration , Song_name FROM "Песни" ORDER BY Song_duration DESC LIMIT 1;
+2) SELECT Song_duration, Song_name FROM "Песни" WHERE Song_duration > '00:03:50';
+3) SELECT collection_title,collection_date FROM "Сборники" WHERE collection_date BETWEEN '2018-01-01' AND '2020-01-01' ;
 4) WITH lastname_tabl AS (
-  SELECT REGEXP_REPLACE(ejecutante_name , '^.*\s+(\S+)$', '\0') AS lastname FROM Исполнители 
+  SELECT REGEXP_REPLACE(Songwriters_name , '^.*\s+(\S+)$', '\0') AS lastname FROM Исполнители 
 )
 SELECT * FROM lastname_tabl WHERE lastname NOT LIKE '%\0%';
-5) SELECT * FROM "Треки"
-	WHERE track_name LIKE '%my%';
+5) SELECT * FROM "Песни"
+	WHERE Song_name LIKE '%my%';
 
 3 задание
 
-1) SELECT genre_name,COUNT(ejecutante_name)FROM "название_музыкальных_жанров"
+1) 
+SELECT genre_name, COUNT(Songwriters_id) FROM Жанр 
+JOIN Исполнители_Жанров on Жанр.genre_id = Исполнители_Жанров.genre_id
+GROUP BY genre_name;
+
+2) 
+SELECT COUNT(Song_name)FROM Альбомы
  JOIN
-  Исполнители
-    ON название_музыкальных_жанров.Id = Исполнители.genre_id
-	GROUP BY genre_name;
-2) SELECT album_name,COUNT(track_name)FROM Альбом
- JOIN
-  Треки
-    ON Альбом.id = Треки.album_id
-	WHERE album_date BETWEEN '2019-01-01' AND '2020-12-31'
-	GROUP BY album_name;
+  Песни
+    ON Альбомы.album_id = Песни.album_id
+	WHERE album_release_year BETWEEN '2019-01-01' AND '2020-12-31'
+	GROUP BY album_release_year;
 	
-3)SELECT album_name,COUNT(track_name), AVG(duration)FROM Альбом
+3)SELECT album_name, AVG(Song_duration) FROM Песни
  JOIN
-  Треки
-    ON Альбом.id = Треки.album_id
-	GROUP BY album_name;
+  Альбомы
+    ON Альбомы.album_id = Песни.album_id
+	GROUP BY album_name ;
 	
-4)SELECT * FROM Исполнители WHERE id NOT IN (SELECT ejecutante_id FROM Альбом 
-WHERE album_date  BETWEEN '2020-01-01' AND '2020-12-31'
-GROUP BY ejecutante_id
-);
+4)SELECT * FROM Исполнители WHERE Songwriters_id NOT IN(SELECT Songwriters_id FROM Альбомы
+join Исполнители_Альбомов
+on Исполнители_Альбомов.album_id = Альбомы.album_id
+WHERE album_release_year  BETWEEN '2020-01-01' AND '2020-12-31');
 	
-5)WITH trek_tabl AS (
-  SELECT Треки.id FROM Треки
+5)SELECT collection_title FROM Сборники
  JOIN
-  Исполнители
-    ON Треки.ejecutante_id = Исполнители.id
-	WHERE ejecutante_name LIKE '%Михаил Круг%' 
-)
-SELECT collection_name FROM trek_tabl
- JOIN
-  Сборники
-    ON Сборники.song_id = trek_tabl.id 
-	GROUP BY collection_name; 
+  Сборники_Песен
+    ON Сборники_Песен.collection_id = Сборники.collection_id 
+JOIN Песни
+ON Сборники_Песен.Song_id = Песни.Song_id
+JOIN Исполнители_Альбомов
+ON Исполнители_Альбомов.album_id = Песни.album_id
+JOIN Исполнители
+ON  Исполнители.Songwriters_id = Исполнители_Альбомов.Songwriters_id
+where Songwriters_name = 'Захаров Владимир'
+	GROUP BY collection_title; ; 
 	
